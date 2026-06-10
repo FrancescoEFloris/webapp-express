@@ -15,6 +15,7 @@ async function index(request, response) {
 
         let sql = `
             SELECT DISTINCT
+                p.id,
                 p.name,
                 p.description,
                 p.price,
@@ -71,5 +72,7 @@ async function index(request, response) {
             success: false,
             message: 'Internal Server Error'
         });
-    }
+    };
 }
+
+export { index };
