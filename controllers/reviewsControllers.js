@@ -41,7 +41,7 @@ async function createReview(request, response) {
         const query = `INSERT INTO reviews (name, title, review_content, rating, created_at)
                         VALUES (?, ?, ?, ?, NOW());`
 
-        const [results] = await connection.execute(query, [
+        const [result] = await connection.execute(query, [
             name,
             title,
             review_content,
@@ -49,13 +49,19 @@ async function createReview(request, response) {
         ]);
 
         return response.status(201).json({
-            messaggio: "Recensione creata con successo",
-            data: newReview,
+            message: "Recensione creata con successo",
+            data: {
+                id: result.insertId,
+                name,
+                title,
+                review_content,
+                rating
+            }
         });
 
     } catch (error) {
         return response.status(500).json({
-            errore: "Errore interno del server",
+            error: "Internal Error",
         });
     }
 }
