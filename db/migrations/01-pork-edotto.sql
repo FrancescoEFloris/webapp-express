@@ -13,7 +13,7 @@ CREATE TABLE `products`(
     `place_of_origin` VARCHAR(45) NULL,
     `created_at` TIMESTAMP NOT NULL,
     `updated_at` TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP,
-    `deleted_at` TIMESTAMP NOT NULL
+    `deleted_at` TIMESTAMP NULL DEFAULT NULL
 );
 
 CREATE TABLE `categories`(
