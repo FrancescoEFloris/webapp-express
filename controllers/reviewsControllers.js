@@ -35,7 +35,7 @@ async function indexReviews(request, response) {
         response.status(200).json({
             success: true,
             data: reviews
-           });
+        });
 
     } catch (error) {
         console.error(error);
@@ -115,7 +115,7 @@ async function IndexReviewsProduct(request, response) {
 }
 
 
-          
+
 //Show:
 async function showReview(request, response) {
     try {
@@ -172,12 +172,13 @@ async function createReview(request, response) {
                 name,
                 title,
                 review_content,
-                rating,
+                rating
+            }
         });
 
     } catch (error) {
         console.error(error)
-            return response.status(500).json({
+        return response.status(500).json({
             error: "Internal Error",
         });
     }
@@ -226,7 +227,7 @@ export {
     updateReview,
     showReview,
     createReview,
-    indexReviews, 
-    IndexReviewsProduct 
+    indexReviews,
+    IndexReviewsProduct
 };
 
