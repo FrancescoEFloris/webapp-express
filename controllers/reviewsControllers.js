@@ -72,8 +72,32 @@ async function updateReview(request, response) {
 }
 
 //Delete:
+async function deleteReview(request, response) {
+    try {
+        const { id } = request.params;
+        const query = `DELETE FROM reviews WHERE id = ?;`;
+        const [result] = await connection.execute(query, [id]);
+        if (result.affectedRows === 0) {
+            return response
+                .status(404)
+                .json({ message: "Not Found." });
+        }
+        return response
+            .status(200)
+            .json({ message: "Review deleted successfully." });
+
+    }
+    catch (error) {
+        console.error("Error deleting review:", error);
+        return response
+            .status(500).json({ error: "Internal Error." });
+    }
+
+}
 
 export {
     updateReview,
-    showReview
+    showReview,
+    deleteReview
+
 };
