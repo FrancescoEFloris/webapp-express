@@ -1,3 +1,12 @@
+import { createConnection } from 'mysql2/promise';
+const connection = await createConnection({
+    host: process.env.DB_HOSTNAME,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+})
+
 //Index:
 
 //Show:
@@ -8,19 +17,18 @@
 async function updateReview(request, response) {
     try {
         const { id } = request.params; 
-        const { name, title, review_content, rating, product_id } = request.body;
+        const { name, title, review_content, rating } = request.body;
 
         const query = `
             UPDATE reviews 
-            SET name = ?, title = ?, review_content = ?, rating = ?, product_id = ?
+            SET name = ?, title = ?, review_content = ?, rating = ?
             WHERE id = ?;
         `;
         const [result] = await connection.execute(query, [
             name, 
             title, 
             review_content, 
-            rating, 
-            product_id, 
+            rating,
             id
         ]);
         //notfound
