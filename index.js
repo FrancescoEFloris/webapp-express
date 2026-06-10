@@ -1,4 +1,5 @@
 import express from "express";
+import reviewRouter from "./routers/reviewRouter.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,6 +11,7 @@ app.get('/', (req, res) => {
         "message": "Benvenuti"
     })
 })
+app.use("/reviews", reviewRouter);
 
 app.listen(PORT, (error) => {
     if (error) {

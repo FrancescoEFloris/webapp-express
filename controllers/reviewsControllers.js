@@ -1,8 +1,15 @@
 
 
+import { createConnection } from 'mysql2/promise';
+const connection = await createConnection({
+    host: process.env.DB_HOSTNAME,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+})
 
-
-
+//Index:
 // Get/reviews restituisce tutte le recensioni con i relativi prodotti
 async function indexReviews(request, response) {
     try {
@@ -28,7 +35,7 @@ async function indexReviews(request, response) {
         response.status(200).json({
             success: true,
             data: reviews
-        });
+           });
 
     } catch (error) {
         console.error(error);
@@ -107,4 +114,119 @@ async function IndexReviewsProduct(request, response) {
     }
 }
 
-export { indexReviews, IndexReviewsProduct };
+
+          
+//Show:
+async function showReview(request, response) {
+    try {
+        const { id } = request.params;
+        const query = `SELECT * FROM reviews WHERE id=?;`
+
+        const [results] = await connection.execute(query, [id]);
+        if (results.length === 0) {
+            return response
+                .status(404)
+                .json({ message: "Review not Found." });
+        }
+        return response
+            .status(200)
+            .json({ results });
+    }
+    catch (error) {
+        console.error("Error requesting review:", error);
+        return response
+            .status(500).json({ error: "Internal Error." });
+    }
+}
+
+//Create:
+
+async function createReview(request, response) {
+    try {
+        const { name, title, review_content, rating, product_id } = request.body;
+
+        const query = `
+    INSERT INTO reviews (
+        name,
+        title,
+        review_content,
+        date,
+        rating,
+        product_id
+    )
+    VALUES (?, ?, ?, NOW(), ?, ?)
+`;
+
+        const [result] = await connection.execute(query, [
+            name,
+            title,
+            review_content,
+            rating,
+            product_id
+        ]);
+
+        return response.status(201).json({
+            message: "Recensione creata con successo",
+            data: {
+                id: result.insertId,
+                name,
+                title,
+                review_content,
+                rating,
+        });
+
+    } catch (error) {
+        console.error(error)
+            return response.status(500).json({
+            error: "Internal Error",
+        });
+    }
+}
+
+// Update:
+async function updateReview(request, response) {
+    try {
+        const { id } = request.params;
+        const { name, title, review_content, rating } = request.body;
+
+        const query = `
+            UPDATE reviews 
+            SET name = ?, title = ?, review_content = ?, rating = ?
+            WHERE id = ?;
+        `;
+        const [result] = await connection.execute(query, [
+            name,
+            title,
+            review_content,
+            rating,
+            id
+        ]);
+        //notfound
+        if (result.affectedRows === 0) {
+            return response
+                .status(404)
+                .json({ message: "Review not Found." });
+        }
+        //ok
+        return response.status(200).json({
+            message: "Your review was updated!",
+            id: id
+        });
+
+    } catch (error) {
+        console.error("Error updating review:", error);
+        return response
+            .status(500).json({ error: "Internal Error." });
+    }
+}
+
+//Delete:
+
+export {
+    updateReview,
+    showReview,
+    createReview,
+    indexReviews, 
+    IndexReviewsProduct 
+};
+
