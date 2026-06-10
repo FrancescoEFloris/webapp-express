@@ -58,7 +58,7 @@ async function indexCategoriesProducts(request, response) {
             WHERE id = ?`,
             [realId]);
 
-        if if (category.length === 0) {
+        if (category.length === 0) {
             return response.status(404).json({
                 success: false,
                 message: 'Category not found'
