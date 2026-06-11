@@ -149,11 +149,10 @@ async function createReview(request, response) {
         name,
         title,
         review_content,
-        date,
         rating,
         product_id
     )
-    VALUES (?, ?, ?, NOW(), ?, ?)
+    VALUES (?, ?, ?, ?, ?)
 `;
 
         const [result] = await connection.execute(query, [
