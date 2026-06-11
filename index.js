@@ -2,6 +2,7 @@ import express from "express";
 import reviewRouter from "./routers/reviewRouter.js";
 import productRouter from "./routers/productRouter.js";
 import categoryRouter from "./routers/categoriesRouter.js";
+import cors from "cors";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
