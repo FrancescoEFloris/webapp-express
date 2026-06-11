@@ -51,9 +51,21 @@ async function indexProduct(request, response) {
 
         const [products] = await connection.query(sql, params);
 
+        const baseUrl = `${request.protocol}://${request.get('host')}`;
+
+        const productsWithImages = products.map(product => {
+
+            const imageFileName = product.image ? product.image : "placeholder.png";
+
+            return {
+                ...product,
+                image: `${baseUrl}/images/${imageFileName}`
+            };
+        });
+
         response.status(200).json({
             success: true,
-            data: products
+            data: productsWithImages
         });
 
     } catch (error) {
@@ -80,7 +92,7 @@ async function showProduct(request, response) {
         place_of_origin 
         FROM products WHERE id=?;`
 
-        const [results] = await connection.execute(query, [id]);
+        const [results] = await connection.execute(query, [productId]);
         if (results.length === 0) {
             return response
                 .status(404)
