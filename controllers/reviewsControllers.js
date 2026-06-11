@@ -1,12 +1,6 @@
 
-import { createConnection } from 'mysql2/promise';
-const connection = await createConnection({
-    host: process.env.DB_HOSTNAME,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-})
+import connection from '../config/database.js';
+import validateId from '../middlewares/validateId.js';
 
 //Index:
 // Get/reviews restituisce tutte le recensioni con i relativi prodotti
@@ -50,18 +44,10 @@ async function indexReviews(request, response) {
 async function IndexReviewsProduct(request, response) {
     try {
 
-        const { id } = request.params;
-        const realId = Number(id);
-
-        if (isNaN(realId)) {
-            return response.status(400).json({
-                success: false,
-                message: 'Invalid product id'
-            });
-        }
+        const productId = request.validateId;
 
         //Verifica esistenza prodotto
-        const [product] = await connection.query(
+        const [product] = await connection.execute(
             `
             SELECT
                 id,
@@ -69,7 +55,7 @@ async function IndexReviewsProduct(request, response) {
             FROM products
             WHERE id = ?
             `,
-            [realId]
+            [productId]
         );
 
         if (product.length === 0) {
@@ -80,7 +66,7 @@ async function IndexReviewsProduct(request, response) {
         }
 
         // Recupero recensioni associate al prodotto
-        const [reviews] = await connection.query(
+        const [reviews] = await connection.execute(
             `
             SELECT
                 id,
@@ -93,7 +79,7 @@ async function IndexReviewsProduct(request, response) {
             WHERE product_id = ?
             ORDER BY date DESC
             `,
-            [realId]
+            [productId]
         );
 
         response.status(200).json({
@@ -118,10 +104,10 @@ async function IndexReviewsProduct(request, response) {
 //Show:
 async function showReview(request, response) {
     try {
-        const { id } = request.params;
+        const reviewId = request.validateId;
         const query = `SELECT * FROM reviews WHERE id=?;`
 
-        const [results] = await connection.execute(query, [id]);
+        const [results] = await connection.execute(query, [reviewId]);
         if (results.length === 0) {
             return response
                 .status(404)
@@ -185,7 +171,7 @@ async function createReview(request, response) {
 // Update:
 async function updateReview(request, response) {
     try {
-        const { id } = request.params;
+        const reviewsId = request.validateId
         const { name, title, review_content, rating } = request.body;
 
         const query = `
@@ -198,7 +184,7 @@ async function updateReview(request, response) {
             title,
             review_content,
             rating,
-            id
+            reviewsId
         ]);
         //notfound
         if (result.affectedRows === 0) {
@@ -222,7 +208,7 @@ async function updateReview(request, response) {
 //Delete:
 async function deleteReview(request, response) {
     try {
-        const { id } = request.params;
+        const reviewId = request.validateId
         const query = `DELETE FROM reviews WHERE id = ?;`;
         const [result] = await connection.execute(query, [id]);
         if (result.affectedRows === 0) {

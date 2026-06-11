@@ -1,18 +1,11 @@
-import { createConnection } from 'mysql2/promise';
-
-const connection = await createConnection({
-    host: process.env.DB_HOSTNAME,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-});
+import connection from '../config/database.js';
+import validateId from '../middlewares/validateId.js';
 
 // Get/categories restituisce tutte le categorie(in ordine alfabetico)
 async function indexCategories(request, response) {
     try {
 
-        const [categories] = await connection.query(`
+        const [categories] = await connection.execute(`
             SELECT
                 id,
                 name,
@@ -39,24 +32,17 @@ async function indexCategories(request, response) {
 // Get/categories/:id/products restituisce tutti i prodotti di una categoria specifica
 async function indexCategoriesProducts(request, response) {
     try {
-        const { id } = request.params;
-        const realId = Number(id);
 
-        if (isNaN(realId)) {
-            return response.status(400).json({
-                success: false,
-                message: 'Invalid category id'
-            });
-        }
+        const categoryId = request.validateId
 
         //Verifica esistenza categorie
-        const [category] = await connection.query(`
+        const [category] = await connection.execute(`
              SELECT
                 id,
                 name
             FROM categories
             WHERE id = ?`,
-            [realId]);
+            [categoryId]);
 
         if (category.length === 0) {
             return response.status(404).json({
@@ -66,7 +52,7 @@ async function indexCategoriesProducts(request, response) {
         }
 
         // Recupero prodotti associati alla categoria
-        const [products] = await connection.query(
+        const [products] = await connection.execute(
             `
             SELECT
                 p.id,
@@ -75,7 +61,7 @@ async function indexCategoriesProducts(request, response) {
                 p.price,
                 p.image,
                 p.place_of_origin,
-                p.if_available
+                p.is_available
             FROM products p
 
             JOIN product_category pc
@@ -83,7 +69,7 @@ async function indexCategoriesProducts(request, response) {
 
             WHERE pc.category_id = ?
             `,
-            [realId]
+            [categoryId]
         );
 
         response.status(200).json({
@@ -107,10 +93,10 @@ async function indexCategoriesProducts(request, response) {
 //Show:
 async function showCategory(request, response) {
     try {
-        const { id } = request.params;
+        const categoryId = request.validateId
         const query = `SELECT * FROM categories WHERE id=?;`
 
-        const [results] = await connection.execute(query, [id]);
+        const [results] = await connection.execute(query, [categoryId]);
         if (results.length === 0) {
             return response
                 .status(404)
@@ -127,4 +113,4 @@ async function showCategory(request, response) {
     }
 }
 
-export {indexCategories, indexCategoriesProducts, showCategory};
+export { indexCategories, indexCategoriesProducts, showCategory };
