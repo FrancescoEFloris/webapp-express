@@ -13,7 +13,8 @@ async function indexProduct(request, response) {
                 p.price,
                 p.image,
                 p.place_of_origin,
-                p.is_available
+                p.is_available,
+                p.created_at
             FROM products p
         `;
 
@@ -50,16 +51,13 @@ async function indexProduct(request, response) {
         }
 
         if (sortBy === 'recent') {
-            sql += ` ORDER BY p.id DESC `;
+            sql += ` ORDER BY p.created_at DESC `;
         }
 
         if (limit) {
             sql += ` LIMIT ? `;
             params.push(Number(limit));
         }
-
-        console.log("SQL Query:", sql);
-        console.log("Params:", params);
 
         const [products] = await connection.query(sql, params);
 
@@ -69,8 +67,10 @@ async function indexProduct(request, response) {
 
             const imageFileName = product.image ? product.image : "placeholder.png";
 
+            const { created_at, ...productData } = product;
+
             return {
-                ...product,
+                ...productData,
                 image: `${baseUrl}/images/${imageFileName}`
             };
         });
