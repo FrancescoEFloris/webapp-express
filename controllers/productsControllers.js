@@ -95,16 +95,24 @@ async function indexProduct(request, response) {
 async function showProduct(request, response) {
     try {
         const productId = request.validateId
-        const query = `SELECT 
-        id,
-        name,
-        description,
-        price,
-        image,
-        place_of_origin 
-        FROM products WHERE id=?;`
+        const productQuery = `
+            SELECT 
+                p.id,
+                p.name,
+                p.description,
+                p.price,
+                p.image,
+                p.place_of_origin,
+                COUNT(r.id) AS reviews_count,
+                AVG(r.rating) AS average_rating
+            FROM products p
+            LEFT JOIN reviews r 
+                ON p.id = r.product_id
+            WHERE p.id = ?
+            GROUP BY p.id;
+        `;
 
-        const [results] = await connection.execute(query, [productId]);
+        const [results] = await connection.execute(productQuery, [productId]);
         if (results.length === 0) {
             return response
                 .status(404)
@@ -114,6 +122,29 @@ async function showProduct(request, response) {
         const product = results[0];
 
         product.price = parseFloat(product.price);
+
+        product.reviewsCount = Number(product.reviews_count) || 0;
+
+        product.averageRating = product.average_rating
+            ? parseFloat(product.average_rating).toFixed(1)
+            : "0.0";
+
+        delete product.reviews_count;
+        delete product.average_rating;
+
+        const reviewsQuery = `
+            SELECT 
+                id,
+                name,
+                review_content,
+                rating
+            FROM reviews 
+            WHERE product_id = ?;
+        `;
+
+        const [reviews] = await connection.execute(reviewsQuery, [productId])
+
+        product.reviews = reviews;
 
         return response
             .status(200)
