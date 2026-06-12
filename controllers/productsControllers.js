@@ -117,7 +117,10 @@ async function showProduct(request, response) {
         if (results.length === 0) {
             return response
                 .status(404)
-                .json({ message: "Product not Found." });
+                .json({
+                    success: false,
+                    message: "Product not Found."
+                });
         }
 
         const product = results[0];
@@ -152,12 +155,19 @@ async function showProduct(request, response) {
 
         return response
             .status(200)
-            .json(product);
-    }
-    catch (error) {
+            .json({
+                success: true,
+                data: product
+            });
+
+    } catch (error) {
         console.error("Error requesting product:", error);
         return response
-            .status(500).json({ error: "Internal Error." });
+            .status(500)
+            .json({
+                success: false,
+                message: "Internal Error."
+            });
     }
 }
 

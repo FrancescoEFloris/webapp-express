@@ -14,9 +14,9 @@ async function indexCategories(request, response) {
             ORDER BY name ASC
             `);
 
-        response.status(200).json({
+        return response.status(200).json({
             success: true,
-            message: categories
+            data: categories
         });
     } catch (error) {
 
@@ -100,16 +100,27 @@ async function showCategory(request, response) {
         if (results.length === 0) {
             return response
                 .status(404)
-                .json({ message: "Category not Found." });
+                .json({
+                    success: false,
+                    message: "Category not Found."
+                });
         }
         return response
             .status(200)
-            .json({ results });
+            .json({
+                success: true,
+                data: results[0]
+            });
     }
     catch (error) {
         console.error("Error requesting category:", error);
+
         return response
-            .status(500).json({ error: "Internal Error." });
+            .status(500)
+            .json({
+                success: false,
+                message: "Internal Error."
+            });
     }
 }
 

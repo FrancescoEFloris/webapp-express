@@ -111,16 +111,26 @@ async function showReview(request, response) {
         if (results.length === 0) {
             return response
                 .status(404)
-                .json({ message: "Review not Found." });
+                .json({
+                    success: false,
+                    message: "Review not Found."
+                });
         }
         return response
             .status(200)
-            .json({ results });
+            .json({
+                success: true,
+                data: results[0]
+            });
     }
     catch (error) {
         console.error("Error requesting review:", error);
         return response
-            .status(500).json({ error: "Internal Error." });
+            .status(500)
+            .json({
+                success: false,
+                message: "Internal Error."
+            });
     }
 }
 
@@ -150,6 +160,7 @@ async function createReview(request, response) {
         ]);
 
         return response.status(201).json({
+            success: true,
             message: "Recensione creata con successo",
             data: {
                 id: result.insertId,
@@ -161,9 +172,10 @@ async function createReview(request, response) {
         });
 
     } catch (error) {
-        console.error(error)
+        console.error(error);
         return response.status(500).json({
-            error: "Internal Error",
+            success: false,
+            message: "Internal Error",
         });
     }
 }
@@ -190,18 +202,26 @@ async function updateReview(request, response) {
         if (result.affectedRows === 0) {
             return response
                 .status(404)
-                .json({ message: "Review not Found." });
+                .json({
+                    success: false,
+                    message: "Review not Found."
+                });
         }
         //ok
         return response.status(200).json({
+            success: true,
             message: "Your review was updated!",
-            id: id
+            data: { id: reviewsId }
         });
 
     } catch (error) {
         console.error("Error updating review:", error);
         return response
-            .status(500).json({ error: "Internal Error." });
+            .status(500)
+            .json({
+                success: false,
+                message: "Internal Error."
+            });
     }
 }
 
@@ -210,23 +230,31 @@ async function deleteReview(request, response) {
     try {
         const reviewId = request.validateId
         const query = `DELETE FROM reviews WHERE id = ?;`;
-        const [result] = await connection.execute(query, [id]);
+        const [result] = await connection.execute(query, [reviewId]);
         if (result.affectedRows === 0) {
             return response
                 .status(404)
-                .json({ message: "Not Found." });
+                .json({
+                    success: false,
+                    message: "Review not Found."
+                });
         }
         return response
             .status(200)
-            .json({ message: "Review deleted successfully." });
+            .json({
+                success: true,
+                message: "Review deleted successfully."
+            });
 
-    }
-    catch (error) {
+    } catch (error) {
         console.error("Error deleting review:", error);
         return response
-            .status(500).json({ error: "Internal Error." });
+            .status(500)
+            .json({
+                success: false,
+                message: "Internal Error."
+            });
     }
-
 }
 
 export {
