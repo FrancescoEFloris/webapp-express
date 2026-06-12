@@ -137,7 +137,8 @@ async function showProduct(request, response) {
                 id,
                 name,
                 review_content,
-                rating
+                rating,
+                date
             FROM reviews 
             WHERE product_id = ?;
         `;
