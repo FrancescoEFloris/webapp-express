@@ -23,7 +23,7 @@ const handleChat = async (request, response) => {
         });
 
 
-        const { choise, productName } = routerResponse.structuredResponse;
+        const { choise, productName } = routerResponse.structuredResponse ?? { choise: 'GENERIC' };
 
 
         if (choise === 'NAVIGATION') {
