@@ -21,7 +21,7 @@ const goToProductTool = tool(
         }
 
         const [rows] = await connection.execute(
-            `SELECT id, name FROM products WHERE LOWER(name) LIKE LOWER(?) LIMIT 1`,
+            `SELECT id, name FROM products WHERE REPLACE(LOWER(name), ' ', '') LIKE REPLACE(LOWER(?), ' ', '') LIMIT 1`,
             [`%${productName}%`]
         );
 

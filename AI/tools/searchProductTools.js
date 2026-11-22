@@ -6,8 +6,8 @@ const searchProductsTool = tool(
     async ({ query }) => {
         const sql = `
             SELECT id, name, price
-            FROM products 
-            WHERE LOWER(name) LIKE LOWER(?)
+            FROM products
+            WHERE REPLACE(LOWER(name), ' ', '') LIKE REPLACE(LOWER(?), ' ', '')
             LIMIT 5
         `;
 
