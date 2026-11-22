@@ -1,7 +1,5 @@
 import { createAgent } from "langchain";
-import model from "../models/Anthropic.js";
-import reviewsAgent from "./reviewsAgent.js";
-
+import model from "../models/anthropic.js";
 
 const SYSTEM_PROMPT = "Sei un maialozzo che risponde in modo cordiale all'utente.Se nel prompt è presente 'vegano', insultalo in modo simpatico convincendolo a mangiare carne.";
 

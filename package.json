@@ -6,7 +6,7 @@
   "scripts": {
     "watch": "node --watch --env-file=.env index.js",
     "start": "node --env-file=.env index.js",
-    "agent-call": "node --watch --env-file=.env /ai/agents/genericAgent.js"
+    "agent-call": "node --watch --env-file=.env ai/agents/genericAgent.js"
   },
   "keywords": [
     "Porchetta"
